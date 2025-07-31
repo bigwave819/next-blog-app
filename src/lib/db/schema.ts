@@ -1,5 +1,6 @@
 
 
+import { relations } from "drizzle-orm";
 import { 
     pgTable, 
     varchar, 
@@ -15,20 +16,20 @@ export const users = pgTable('users', {
     name: varchar('name', { length: 255 }).notNull(),
     email: varchar('email', { length: 255 }).notNull().unique(),
     emailVerified: boolean("email_verified").default(false),
-    createAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
 
 export const sessions = pgTable('sessions', {
     id: varchar('id', {length : 255}).primaryKey(),
-    userId: varchar('id', { length: 255} )
+    userId: varchar('user_id', { length: 255} )
         .references(() => users.id)
         .notNull(),
     token: varchar('token', { length: 255 }),
     expiresAt: timestamp('expires_at').notNull(),
     ipAddress: varchar('ip_address', { length: 255 }),
     userAgent: text("user_agent"),
-    createAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
@@ -41,7 +42,7 @@ export const accounts = pgTable("accounts", {
     accountId: varchar("account_id", { length: 255 }).notNull(),
     providerId: varchar("provider_id", {length: 255}).notNull(),
     password: text("password"),
-    createAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
@@ -55,6 +56,44 @@ export const post = pgTable('posts',{
     authorId: varchar("author_id", { length: 255})
         .references(() => users.id)
         .notNull(),
-    createAt: timestamp("created_at").defaultNow().notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-})
+});
+
+
+export const usersRelations = relations(post, ({one}) => ({
+    author: one(users, {
+        fields: [post.authorId],
+        references: [users.id]
+    })
+}));
+
+
+export const postRelations = relations(post, ({one}) => ({
+    author: one(users, {
+        fields: [post.authorId],
+        references: [users.id]
+    })
+}))
+
+export const accountsRelations = relations(accounts, ({one}) => ({
+    user: one(users, {
+        fields: [accounts.userId],
+        references: [users.id]
+    })
+}))
+
+export const sessionsRelations = relations(sessions, ({one}) => ({
+    user: one(users, {
+        fields: [sessions.userId],
+        references: [users.id]
+    })
+}))
+
+
+export const schema = {
+    users, 
+    accounts,
+    sessions,
+    post
+}

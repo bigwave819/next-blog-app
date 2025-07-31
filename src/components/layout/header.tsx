@@ -3,11 +3,15 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { useSession } from "@/lib/auth-client";
+import UserMenu from "../auth/user-menu";
 
 
 function Header() {
 
-    const navItems = [ 
+    const { data: session, isPending } = useSession()
+
+    const navItems = [
         {
             label: "Home",
             href: "/"
@@ -16,8 +20,8 @@ function Header() {
             label: "Create",
             href: "/post/create"
         }
-     ]
-    return ( 
+    ]
+    return (
         <header className="border-b bg-background sticky top-0 z-10">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                 <div className="flex items-center gap-6">
@@ -27,13 +31,13 @@ function Header() {
                     <nav className="hidden md:flex items-center gap-6">
                         {
                             navItems.map((navitem) =>
-                                <Link 
-                                key={navitem.href} 
-                                href={navitem.href}
-                                className={cn('text-sm font-medium transition-colors hover:text-primary')}
+                                <Link
+                                    key={navitem.href}
+                                    href={navitem.href}
+                                    className={cn('text-sm font-medium transition-colors hover:text-primary')}
                                 >
                                     {navitem.label}
-                                </Link> 
+                                </Link>
                             )
                         }
                     </nav>
@@ -44,14 +48,19 @@ function Header() {
                     </div>
                     {/** keep an placeholder for Theme toggle */}
                     <div className="flec items-center gap-2">
-                        <Button variant={"default"} asChild>
-                            <Link href={"/auth"} >Login</Link>
-                        </Button>
+                        {
+                            isPending ? null :
+                                session?.user ?
+                                    <UserMenu user={session?.user} /> :
+                                    <Button variant={"default"} asChild>
+                                        <Link href={"/auth"} >Login</Link>
+                                    </Button>
+                        }
                     </div>
                 </div>
             </div>
         </header>
-     );
+    );
 }
 
 export default Header;
