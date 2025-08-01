@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { useSession } from "@/lib/auth-client";
 import UserMenu from "../auth/user-menu";
+import ThemeToggle from "../theme/theme-toggle";
 
 
 function Header() {
@@ -47,6 +48,7 @@ function Header() {
                         {/** keep an placeholder for search */}
                     </div>
                     {/** keep an placeholder for Theme toggle */}
+                    <ThemeToggle />
                     <div className="flec items-center gap-2">
                         {
                             isPending ? null :
